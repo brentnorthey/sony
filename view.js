@@ -50,8 +50,17 @@ export default class View {
     console.log(this.formInput.value);
   }
 
-  _getTotalCount() {
+  getTotalCount() {
     return this.totalCount;
+  }
+
+  setTotalCount(count) {
+    console.log(count);
+   this.totalCount.innerHTML = count;
+  }
+
+  renderStream(stream) {
+    console.log(stream);
   }
 
 }

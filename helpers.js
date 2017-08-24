@@ -4,6 +4,11 @@
  * @param {string} selector Selector to query
  * @param {Element} [scope] Optional scope element for the selector
  */
+export function processData(data)
+{
+  console.log(data);
+  return data;
+}
 
 export function qs(selector, scope) {
   return (scope || document).querySelector(selector);
@@ -59,10 +64,7 @@ export function $delegate(target, selector, type, handler, capture) {
 
 export const escapeForHTML = s => s.replace(/[&<]/g, c => c === '&' ? '&amp;' : '&lt;');
 
-export function processData(data)
-{
-  console.log(data);
-}
+
 /* Utilities */
 
 export const $fetchJSONP = (unique => url =>
