@@ -56,13 +56,16 @@ export function $delegate(target, selector, type, handler, capture) {
  *
  * @returns {string} String with unsafe characters escaped with entity codes
  */
+
 export const escapeForHTML = s => s.replace(/[&<]/g, c => c === '&' ? '&amp;' : '&lt;');
 
-
+export function processData(data)
+{
+  console.log(data);
+}
 /* Utilities */
-let request_url = 'https://api.twitch.tv/kraken/search/streams?q=starcraft';
 
-export const fetchJSONP = (unique => url =>
+export const $fetchJSONP = (unique => url =>
     new Promise(rs => {
       const script = document.createElement('script');
       const name = `_jsonp_${unique++}`;
@@ -83,3 +86,4 @@ export const fetchJSONP = (unique => url =>
       document.body.appendChild(script);
     })
 )(0);
+

@@ -1,5 +1,5 @@
 /* Item Class */
-module.exports = class Item {
+export default class Item {
 
   constructor(name, preview, stream, viewers, desc)
   {
