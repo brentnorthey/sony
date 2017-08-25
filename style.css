@@ -110,8 +110,8 @@ body {
 
 .item__preview {
     background: darkorange;
-    min-height: 10rem;
-    min-width: 10rem;
+    width: 320px;
+    height:180px;
 }
 
 .item__stream {
@@ -136,4 +136,5 @@ body {
 }
 
 .item__submit--disabled {
+
 }
