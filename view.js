@@ -1,5 +1,4 @@
-import {qs, $on, $delegate} from './helpers';
-import Template from './template';
+import {qs, $on} from './helpers';
 
 export default class View {
 
@@ -13,13 +12,7 @@ export default class View {
     this.countLength = qs('.count__length');
     this.countNext = qs('.count__next');
     this.containerItem = qs('.container__item');
-
-    // $on(this.containerItem, 'click', () => {
-    //   console.log(document.data.streams[0]);
-    // });
   }
-
-
 
   bindPrev(handler) {
     $on(this.countPrev, 'click', () => {

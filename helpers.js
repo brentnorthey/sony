@@ -57,6 +57,8 @@ export function $delegate(target, selector, type, handler, capture) {
  */
 
 export const escapeForHTML = s => s.replace(/[&<]/g, c => c === '&' ? '&amp;' : '&lt;');
+
+
 /* Utilities */
 
 export const $fetchJSONP = (unique => url =>
@@ -73,7 +75,7 @@ export const $fetchJSONP = (unique => url =>
       script.src = url;
       window[name] = json => {
         rs(new Response(JSON.stringify(json)));
-
+        console.log('here');
         script.remove();
         delete window[name];
       };
@@ -81,4 +83,3 @@ export const $fetchJSONP = (unique => url =>
       document.body.appendChild(script);
     })
 )(0);
-

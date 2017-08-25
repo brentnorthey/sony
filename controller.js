@@ -1,16 +1,13 @@
-import Template from './template';
 import {qs, $fetchJSONP} from './helpers';
-
-import Controller from './controller';
 import Item from './item';
-import View from './view';
 
 export default class Controller {
   constructor(name, view) {
     this.client_id = 'xzsmhnyi8grqdveqjez2sog16fhcoj';
     this.currentStream = null;
-    this.currentIndex = 1;
     this.offset = 10;
+    this.currentIndex = 1;
+    this.currentLength =  0;
     this.name = name;
     this.view = view;
     view.bindPrev(this.prev.bind(this));
@@ -28,7 +25,6 @@ export default class Controller {
 
   setStream(query) {
     let request_url = 'https://api.twitch.tv/kraken/search/streams?q=' + query + '&offset=' + this.getOffset() + '&callback=processData&client_id=' + this._getClientId();
-
     $fetchJSONP(request_url);
     this.updateData();
   }
@@ -39,11 +35,11 @@ export default class Controller {
 
   prev() {
     let stream = this.getStream();
-    let request_url = stream._links.prev + '&offset=' + this.getOffset() + '&callback=processData&client_id=' + this._getClientId();
+    if (this.getCurrentIndex() == 1 || !stream)
+      return;
+    let request_url = stream._links.prev + '&callback=processData&client_id=' + this._getClientId();
     $fetchJSONP(request_url);
-
     this.updateData();
-
     this.updateCurrentIndex(-1);
     this.view.setCountIndex(this.currentIndex);
     this.renderStream();
@@ -51,7 +47,11 @@ export default class Controller {
 
   next() {
     let stream = this.getStream();
-    let request_url = stream._links.next + '&offset=' + this.getOffset() + '&callback=processData&client_id=' + this._getClientId();
+
+    if (this.getCurrentIndex() >= this.getCurrentLength() || !stream)
+      return;
+
+    let request_url = stream._links.next + '&callback=processData&client_id=' + this._getClientId();
     $fetchJSONP(request_url);
 
     this.updateData();
@@ -70,21 +70,33 @@ export default class Controller {
   }
 
   setCountLength() {
-    let stream = this.getStream();
-    if (stream)
-      this.view.setCountLength(Math.ceil(stream._total / 10));
+      this.view.setCountLength(this.getCurrentLength());
+  }
+
+  getCurrentLength(){
+    return this.currentLength;
   }
 
   getCurrentIndex() {
     return this.currentIndex;
   }
 
-  getOffset(){
+  getOffset() {
     return this.offset;
   }
 
   updateCurrentIndex(val) {
     this.currentIndex = this.currentIndex + val;
+  }
+
+  setCurrentIndex(val) {
+    this.currentIndex = val;
+  }
+
+  setCurrentLength(){
+    let stream = this.getStream();
+    if (stream)
+      this.currentLength = Math.ceil(stream._total / this.offset);
   }
 
   renderStream() {
@@ -97,6 +109,7 @@ export default class Controller {
   updateData() {
     setTimeout(() => {
       this.currentStream = document.data;
+      this.setCurrentLength();
       this.setCountLength();
       this.setCountIndex();
       this.setTotalCount();
@@ -105,6 +118,7 @@ export default class Controller {
   }
 
   submit() {
+    this.setCurrentIndex(1);
     this.setStream(this.view.getFormInput().value, 10);
   }
 }
