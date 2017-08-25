@@ -60,53 +60,83 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["c"] = qs;
+/* harmony export (immutable) */ __webpack_exports__["b"] = $on;
+/* unused harmony export $delegate */
+/**
+ * querySelector wrapper
+ *
+ * @param {string} selector Selector to query
+ * @param {Element} [scope] Optional scope element for the selector
+ */
+function qs(selector, scope) {
+  return (scope || document).querySelector(selector);
+}
+
+/**
+ * addEventListener wrapper
+ *
+ * @param {Element|Window} target Target Element
+ * @param {string} type Event name to bind to
+ * @param {Function} callback Event callback
+ * @param {boolean} [capture] Capture the event
+ */
+function $on(target, type, callback, capture) {
+  target.addEventListener(type, callback, !!capture);
+}
+
+/**
+ * Attach a handler to an event for all elements matching a selector.
+ *
+ * @param {Element} target Element which the event must bubble to
+ * @param {string} selector Selector to match
+ * @param {string} type Event name
+ * @param {Function} handler Function called when the event bubbles to target
+ *                           from an element matching selector
+ * @param {boolean} [capture] Capture the event
+ */
+function $delegate(target, selector, type, handler, capture) {
+  const dispatchEvent = event => {
+    const targetElement = event.target;
+    const potentialElements = target.querySelectorAll(selector);
+    let i = potentialElements.length;
+
+    while (i--) {
+      if (potentialElements[i] === targetElement) {
+        handler.call(targetElement, event);
+        break;
+      }
+    }
+  };
+
+  $on(target, type, dispatchEvent, !!capture);
+}
+
+/**
+ * Encode less-than and ampersand characters with entity codes to make user-
+ * provided text safe to parse as HTML.
+ *
+ * @param {string} s String to escape
+ *
+ * @returns {string} String with unsafe characters escaped with entity codes
+ */
+
+const escapeForHTML = s => s.replace(/[&<]/g, c => c === '&' ? '&amp;' : '&lt;');
+/* unused harmony export escapeForHTML */
 
 
-console.log(__webpack_require__(1));
-console.log(__webpack_require__(2));
-console.log(__webpack_require__(3));
-__webpack_require__(4);
 
-/* Controller */
+/* Utilities */
 
-/* View */
-
-
-
-/* Utilityies */
-let request_url = 'https://api.twitch.tv/kraken/search/streams?q=starcraft';
-
-//  function getData() {
-//    let req = new XMLHttpRequest();
-//    req.onreadystatechange = function () {
-//      if (req.readyState == 4 && req.status == 200) {
-//         return processRequest(req.responseText);
-//      } else {
-//        console.log('Error with Imgur Request.');
-//      }
-//    };
-//
-//    req.open("GET", request_url, true); // true for asynchronous
-////    req.setRequestHeader('Authorization', 'Client-ID ' + api_key);
-//    req.send(null);
-//  }
-
-// function processRequest(response_text) {
-//   if (response_text == "Not found") {
-//     console.log("Twitch Stream not found.");
-//   } else {
-//     let json = JSON.parse(response_text);
-//     return json
-//   }
-// }
-
-const fetchJSONP = (unique => url =>
+const $fetchJSONP = (unique => url =>
     new Promise(rs => {
       const script = document.createElement('script');
       const name = `_jsonp_${unique++}`;
@@ -120,6 +150,7 @@ const fetchJSONP = (unique => url =>
       script.src = url;
       window[name] = json => {
         rs(new Response(JSON.stringify(json)));
+        console.log('here');
         script.remove();
         delete window[name];
       };
@@ -127,53 +158,248 @@ const fetchJSONP = (unique => url =>
       document.body.appendChild(script);
     })
 )(0);
-
-function qs(selector, scope) {
-  return (scope || document).querySelector(selector);
-}
-
-/* Initialize after DOM is ready */
-let init = function () {
-
-  let myItem = new Item('nagme', 'Stream1', 'Name1', 'Viewers1', 'desc1');
-  console.log(myItem._getName());
-
-//    myItem._setName('Swizzle');
-
-  console.log(myItem._getName());
-
-//   console.log(getData());
-};
-
-if (!!(window.addEventListener))
-  window.addEventListener("DOMContentLoaded", init)
-else // MSIE to be safe
-  window.attachEvent("onload", init);
+/* harmony export (immutable) */ __webpack_exports__["a"] = $fetchJSONP;
 
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "It works from view.js.";
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__view__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__controller__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__helpers__ = __webpack_require__(0);
+
+
+
+
+__webpack_require__(5);
+
+/* Initialize after DOM is ready */
+let init = function () {
+  let view = new __WEBPACK_IMPORTED_MODULE_0__view__["a" /* default */]('View');
+  let controller = new __WEBPACK_IMPORTED_MODULE_1__controller__["a" /* default */] ('Controller', view);
+};
+
+Object(__WEBPACK_IMPORTED_MODULE_2__helpers__["b" /* $on */])(window, 'load', init);
 
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-module.exports = "It works from controller.js.";
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers__ = __webpack_require__(0);
+
+
+class View {
+
+  constructor(name) {
+    this.name = name;
+    this.formInput = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.form__input');
+    this.formSubmit = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.form__submit');
+    this.totalCount = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.total__count');
+    this.countPrev = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.count__prev');
+    this.countIndex = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.count__index');
+    this.countLength = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.count__length');
+    this.countNext = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.count__next');
+    this.containerItem = Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["c" /* qs */])('.container__item');
+  }
+
+  bindPrev(handler) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["b" /* $on */])(this.countPrev, 'click', () => {
+      handler();
+    });
+  }
+
+  bindNext(handler) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["b" /* $on */])(this.countNext, 'click', () => {
+      handler();
+    });
+  }
+
+  getFormInput() {
+    return this.formInput;
+  }
+
+  bindSubmit(handler) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["b" /* $on */])(this.formSubmit, 'click', (e) => {
+      e.preventDefault();
+      handler();
+    });
+  }
+
+  getTotalCount() {
+    return this.totalCount;
+  }
+
+  setCountIndex(index) {
+    this.countIndex.innerHTML = index;
+  }
+
+  setCountLength(length) {
+    this.countLength.innerHTML = length;
+  }
+
+  setTotalCount(count) {
+    this.totalCount.innerHTML = count;
+  }
+
+  renderStream(item) {
+    this.containerItem.innerHTML += item.renderItem();
+  }
+
+  clearItems() {
+    this.containerItem.innerHTML = '';
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = View;
 
 
 /***/ }),
 /* 3 */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__helpers__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__item__ = __webpack_require__(4);
+
+
+
+class Controller {
+  constructor(name, view) {
+    this.client_id = 'xzsmhnyi8grqdveqjez2sog16fhcoj';
+    this.currentStream = null;
+    this.offset = 10;
+    this.currentIndex = 1;
+    this.currentLength =  0;
+    this.name = name;
+    this.view = view;
+    view.bindPrev(this.prev.bind(this));
+    view.bindNext(this.next.bind(this));
+    view.bindSubmit(this.submit.bind(this));
+  }
+
+  _getClientId() {
+    return this.client_id;
+  }
+
+  getStream() {
+    return this.currentStream;
+  }
+
+  setStream(query) {
+    let request_url = 'https://api.twitch.tv/kraken/search/streams?q=' + query + '&offset=' + this.getOffset() + '&callback=processData&client_id=' + this._getClientId();
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["a" /* $fetchJSONP */])(request_url);
+    this.updateData();
+  }
+
+  showName() {
+    return this.name;
+  }
+
+  prev() {
+    let stream = this.getStream();
+    if (this.getCurrentIndex() == 1 || !stream)
+      return;
+    let request_url = stream._links.prev + '&callback=processData&client_id=' + this._getClientId();
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["a" /* $fetchJSONP */])(request_url);
+    this.updateData();
+    this.updateCurrentIndex(-1);
+    this.view.setCountIndex(this.currentIndex);
+    this.renderStream();
+  }
+
+  next() {
+    let stream = this.getStream();
+
+    if (this.getCurrentIndex() >= this.getCurrentLength() || !stream)
+      return;
+
+    let request_url = stream._links.next + '&callback=processData&client_id=' + this._getClientId();
+    Object(__WEBPACK_IMPORTED_MODULE_0__helpers__["a" /* $fetchJSONP */])(request_url);
+
+    this.updateData();
+
+    this.updateCurrentIndex(1);
+    this.view.setCountIndex(this.getCurrentIndex());
+  }
+
+  setTotalCount() {
+    let stream = this.getStream();
+    this.view.setTotalCount(stream._total);
+  }
+
+  setCountIndex() {
+    this.view.setCountIndex(this.currentIndex);
+  }
+
+  setCountLength() {
+      this.view.setCountLength(this.getCurrentLength());
+  }
+
+  getCurrentLength(){
+    return this.currentLength;
+  }
+
+  getCurrentIndex() {
+    return this.currentIndex;
+  }
+
+  getOffset() {
+    return this.offset;
+  }
+
+  updateCurrentIndex(val) {
+    this.currentIndex = this.currentIndex + val;
+  }
+
+  setCurrentIndex(val) {
+    this.currentIndex = val;
+  }
+
+  setCurrentLength(){
+    let stream = this.getStream();
+    if (stream)
+      this.currentLength = Math.ceil(stream._total / this.offset);
+  }
+
+  renderStream() {
+    this.view.clearItems();
+    this.getStream().streams.forEach((element) => {
+      this.view.renderStream(new __WEBPACK_IMPORTED_MODULE_1__item__["a" /* default */](element.game, element.preview.medium, element.game, element.viewers, element.channel.status));
+    });
+  }
+
+  updateData() {
+    setTimeout(() => {
+      this.currentStream = document.data;
+      this.setCurrentLength();
+      this.setCountLength();
+      this.setCountIndex();
+      this.setTotalCount();
+      this.renderStream();
+    }, 1000);
+  }
+
+  submit() {
+    this.setCurrentIndex(1);
+    this.setStream(this.view.getFormInput().value, 10);
+  }
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Controller;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* Item Class */
-
 class Item {
-
-  constructor(name, preview, stream, viewers, desc) {
+  constructor(name, preview, stream, viewers, desc)
+  {
     this.name = name;
     this.preview = preview;
     this.stream = stream;
@@ -181,63 +407,85 @@ class Item {
     this.desc = desc;
   }
 
-  _setName(name) {
+  getPreview() {
+    return this.preview;
+  }
+
+  setPreview(preview) {
+    this.preview = preview;
+  }
+
+  setName(name)
+  {
     this.name = name;
   }
 
-  _getName() {
+  getName()
+  {
     return this.name;
   }
 
-  _setStream(stream) {
-    this.stream = stream
+  setStream(stream)
+  {
+    this.stream = stream;
   }
 
-  _getStream() {
+  getStream()
+  {
     return this.stream;
   }
 
-  _setViewers(viewers) {
+  setViewers(viewers)
+  {
     this.viewers = viewers;
   }
 
-  _getViewers() {
+  getViewers()
+  {
     return this.viewers;
   }
 
-  _setDesc(desc) {
+  setDesc(desc)
+  {
     this.desc = desc;
   }
 
-  _getDesc() {
+  getDesc()
+  {
     return this.desc;
   }
 
-  _renderItem() {
-    let output = `<div class="item">
-          <div class="item__preview">${this._getPreview()}</div>
+  renderItem()
+  {
+    let output = `<div class="item item--simple">
+          <div class="item__preview"><image class="item__preview" src="${this.getPreview()}"/></div>
           <div class="container">
-          <div class="item__stream">${this._getStream()}</div>
-          <div class="item__name"> ${this._getName()}</div>
-          <div class="item__viewers"> ${this._viewers()}</div>
-          <div class="item__desc">${this._getDescgDesc}</div>
-        </div>
-        </div>
-        </div>`;
+          <div class="item__stream">${this.getStream()}</div>
+          <div class="item__name"> ${this.getName()}</div>
+          <div class="item__viewers"> ${this.getViewers()} viewers</div>
+          <div class="item__desc">${this.getDesc()}</div>
+          </div>
+          </div>
+          </div>`;
 
     return output;
   }
-
 }
+/* harmony export (immutable) */ __webpack_exports__["a"] = Item;
+
+
+
+
+
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(5);
+var content = __webpack_require__(6);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // Prepare cssTransformation
 var transform;
@@ -245,7 +493,7 @@ var transform;
 var options = {}
 options.transform = transform
 // add the styles to the DOM
-var update = __webpack_require__(7)(content, options);
+var update = __webpack_require__(8)(content, options);
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -262,21 +510,21 @@ if(false) {
 }
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(6)(undefined);
+exports = module.exports = __webpack_require__(7)(undefined);
 // imports
 
 
 // module
-exports.push([module.i, "html {\n    margin: 0 0 0 0;\n    padding: 0;\n    font-size: 14px;\n}\n\nbody {\n    background: #1E1E1E;\n    color: #ccc;\n    display: flex;\n    justify-content: space-between;\n    font-family: Tahoma, Geneva, Sans-Serif;\n    font-style: 1.2rem;\n    margin: 0;\n    padding: 0;\n    user-select: none;\n}\n\n.container {\n    margin: .5rem;\n    padding: .5rem;\n}\n\n.container--main {\n    border: 1px solid orange;\n}\n\n.container__search {\n    display: flex;\n    background: #3C3F41;\n    border: 1px solid orange;\n    align-items: flex-end;\n    height: 10rem;\n}\n\n.container__item {\n    border: 1px solid orange;\n}\n\n.form {\n}\n\n.form--simple {\n}\n\n.form__input {\n    border: .3rem solid darkorange;\n    background: #CCC;\n    height: 2rem;\n}\n\n.form__submit {\n    border: .3rem solid darkorange;\n    height: 2rem;\n\n}\n\n.form__submit--disabled {\n}\n\n.item {\n    display: flex;\n    width: 80%;\n}\n\n.item--simple {\n}\n\n.item__preview {\n    background: darkorange;\n    min-height: 10rem;\n}\n\n.item__stream {\n    font-size: 3rem;\n}\n\n.item__viewers {\n    display: inline-block;\n    font-size: 1.5rem;\n}\n\n.item__name {\n    display: inline-block;\n    font-size: 1.5rem;\n}\n\n.item__name:after {\n    content: \" - \";\n}\n\n.item__submit {\n}\n\n.item__submit--disabled {\n}\n", ""]);
+exports.push([module.i, "html {\n    margin: 0 0 0 0;\n    padding: 0;\n    font-size: 14px;\n}\n\nbody {\n    background: #1E1E1E;\n    color: #ccc;\n    display: flex;\n    justify-content: space-between;\n    font-family: Tahoma, Geneva, Sans-Serif;\n    font-size: 1rem;\n    margin: 0;\n    padding: 0;\n    user-select: none;\n}\n\n.container {\n    margin: .5rem;\n    padding: .5rem;\n}\n\n.container--main {\n    background: #2B2B2B;\n    border: 1px solid orange;\n    margin: 2rem auto;\n    width: 80%;\n}\n\n.container__search {\n    display: flex;\n    background: #3C3F41;\n    border: 1px solid orange;\n    align-items: flex-end;\n    height: 10rem;\n}\n\n.container__control {\n    display: flex;\n    justify-content: space-between;\n}\n\n.container__item {\n    border: 1px solid orange;\n}\n\n.form {\n}\n\n.form--simple {\n}\n\n.form__input {\n    background: #CCC;\n    height: 2rem;\n    min-width: 20rem;\n    max-width: 90%;\n}\n\n.form__submit {\n    height: 2rem;\n}\n\n.form__submit--disabled {\n}\n\n.count {\n    display: flex;\n    justify-content: space-between;\n}\n\n.count__prev {\n    padding: .3rem;\n}\n\n.count__next {\n    padding: .3rem;\n}\n\n.count__index {\n    padding: .3rem;\n}\n\n.count__index:after {\n    content: ' /';\n}\n\n.count__length {\n    padding: .3rem;\n}\n\n.total__count {\n    margin-left: 5px;\n}\n\n.total {\n    display: flex;\n    align-items: center;\n}\n\n.item {\n    display: flex;\n    width: 100%;\n}\n\n.item--simple {\n    padding: 1rem;\n}\n\n.item__preview {\n    background: darkorange;\n    width: 320px;\n    height:180px;\n}\n\n.item__stream {\n    font-size: 2rem;\n}\n\n.item__viewers {\n    display: inline-block;\n    font-size: 1.5rem;\n}\n\n.item__name {\n    display: inline-block;\n    font-size: 1.5rem;\n}\n\n.item__name:after {\n    content: \" - \";\n}\n\n.item__submit {\n}\n\n.item__submit--disabled {\n\n}", ""]);
 
 // exports
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /*
@@ -358,7 +606,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -404,7 +652,7 @@ var singleton = null;
 var	singletonCounter = 0;
 var	stylesInsertedAtTop = [];
 
-var	fixUrls = __webpack_require__(8);
+var	fixUrls = __webpack_require__(9);
 
 module.exports = function(list, options) {
 	if (typeof DEBUG !== "undefined" && DEBUG) {
@@ -717,7 +965,7 @@ function updateLink (link, options, obj) {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports) {
 
 
